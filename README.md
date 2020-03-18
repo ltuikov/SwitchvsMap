@@ -1,34 +1,52 @@
-# Without any optimization
+# Test results without optimization
+Testing switch vs. map verbatim, without
+any linear map guessing of the switch by the compiler.
+The results show that the map is about 2.5-3x faster,
+as expected.
 ```
-nirmoy@brihaspati:~/SwitchvsMap> gcc  main.c
-nirmoy@brihaspati:~/SwitchvsMap> ./a.out
-TESTING data size 1000
-0.000004 sec, total time taken by static map conversion
-0.000015 sec, total time taken by switch conversion
-TESTING data size 10000
-0.000051 sec, total time taken by static map conversion
-0.000153 sec, total time taken by switch conversion
-TESTING data size 100000
-0.000599 sec, total time taken by static map conversion
-0.001566 sec, total time taken by switch conversion
-TESTING data size 1000000
-0.003339 sec, total time taken by static map conversion
-0.008236 sec, total time taken by switch conversion
+$time ./test-lookup
+Testing data size of 1e+06 lookups, in seconds
+   map:  0.002903
+switch:  0.008037
+   map:  0.002899
+switch:  0.008032
+Testing data size of 1e+09 lookups, in seconds
+   map:  2.837281
+switch:  7.812687
+   map:  2.840947
+switch:  7.855245
+
+real    0m48.449s
+user    0m45.184s
+sys     0m3.095s
+$_
 ```
-# with O2 optimization
+
+# Test results with -O2 optimization
+The compiler figures out the linear transformation
+of the map, and uses it. However a map is still
+slightly faster.
+
+It's worth to note that this is a very simple linear
+transformation, and should a switch-case be used
+for a more complex map, the compiler may not be able
+to figure it out and may resort to a switch-case
+whose timings are shown above.
 ```
-nirmoy@brihaspati:~/SwitchvsMap> gcc  main.c -O2
-nirmoy@brihaspati:~/SwitchvsMap> ./a.out
-TESTING data size 1000
-0.000001 sec, total time taken by static map conversion
-0.000001 sec, total time taken by switch conversion
-TESTING data size 10000
-0.000014 sec, total time taken by static map conversion
-0.000019 sec, total time taken by switch conversion
-TESTING data size 100000
-0.000163 sec, total time taken by static map conversion
-0.000157 sec, total time taken by switch conversion
-TESTING data size 1000000
-0.001176 sec, total time taken by static map conversion
-0.001403 sec, total time taken by switch conversion
+$time ./test-lookup
+Testing data size of 1e+06 lookups, in seconds
+   map:  0.001334
+switch:  0.001300
+   map:  0.001301
+switch:  0.001295
+Testing data size of 1e+09 lookups, in seconds
+   map:  1.290082
+switch:  1.297465
+   map:  1.298246
+switch:  1.301629
+
+real    0m29.591s
+user    0m26.350s
+sys     0m3.114s
+$_
 ```
